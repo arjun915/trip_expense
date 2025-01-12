@@ -1,0 +1,155 @@
+{% extends 'expenses/base.html' %}
+
+{% block title %}Trip Details{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-lg p-6">
+    <h2 class="text-2xl font-semibold mb-4">Trip: {{ trip.name }}</h2>
+    <p class="text-lg text-gray-700 mb-6">Created at: {{ trip.created_at }}</p>
+
+    <!-- Table for Participants -->
+    <h3 class="text-xl font-semibold mb-3">Participants</h3>
+    <table class="table table-bordered">
+        <thead class="bg-gray-200">
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for participant in trip.participants.all %}
+            <tr>
+                <td>{{ participant.name }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm">Edit</button>
+                    <button class="btn btn-danger btn-sm">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center text-gray-500">No participants added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Button to Open Modal for Adding Participant -->
+    <button class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
+        Add Participant
+    </button>
+
+    <!-- Table for Expenses -->
+    <h3 class="text-xl font-semibold mb-3 mt-8">Expenses</h3>
+    <table class="table table-bordered">
+        <thead class="bg-gray-200">
+            <tr>
+                <th>Description</th>
+                <th>Total Amount</th>
+                <th>Paid By</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in trip.expenses.all %}
+            <tr>
+                <td>{{ expense.description }}</td>
+                <td>${{ expense.total_amount }}</td>
+                <td>{{ expense.paid_by.name }}</td>
+                <td>{{ expense.date }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm">Edit</button>
+                    <button class="btn btn-danger btn-sm">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-gray-500">No expenses added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Button to Open Modal for Adding Expense -->
+    <button class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+        Add Expense
+    </button>
+    <div class="mt-6">
+        <a href="{% url 'trip_summary' trip.id %}" 
+           class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition">
+           View Trip Summary
+        </a>
+    </div>
+</div>
+
+<!-- Modal for Adding Participant -->
+<div class="modal fade" id="addParticipantModal" tabindex="-1" aria-labelledby="addParticipantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addParticipantModalLabel">Add New Participant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'add_participant' trip.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Participant Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Participant</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Expense -->
+<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addExpenseModalLabel">Add New Expense</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'add_expense' trip.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Expense Description</label>
+                        <input type="text" class="form-control" id="description" name="description" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="total_amount" class="form-label">Total Amount</label>
+                        <input type="number" class="form-control" id="total_amount" name="total_amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paid_by" class="form-label">Paid By</label>
+                        <select class="form-select" id="paid_by" name="paid_by" required>
+                            {% for participant in trip.participants.all %}
+                            <option value="{{ participant.id }}">{{ participant.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

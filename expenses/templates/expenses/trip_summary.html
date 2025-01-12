@@ -1,0 +1,48 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="container mx-auto py-6">
+    <h1 class="text-2xl font-bold mb-4">{{ trip.name }} - Summary</h1>
+
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold">Total Expenses: ₹{{ total_expenses }}</h2>
+    </div>
+
+    <h2 class="text-xl font-semibold mb-4">Participants</h2>
+    <table class="table-auto w-full border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="border border-gray-300 px-4 py-2">Name</th>
+                <th class="border border-gray-300 px-4 py-2">Total Contribution</th>
+                <th class="border border-gray-300 px-4 py-2">Amount Owed</th>
+                <th class="border border-gray-300 px-4 py-2">Dues</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for participant in participant_data %}
+            <tr>
+                <td class="border border-gray-300 px-4 py-2">{{ participant.name }}</td>
+                <td class="border border-gray-300 px-4 py-2">₹{{ participant.total_contribution }}</td>
+                <td class="border border-gray-300 px-4 py-2">₹{{ participant.amount_owed }}</td>
+                <td>
+                    {% if participant.dues > 0 %}
+                        <!-- Display in Red if dues are negative (underpaid) -->
+                        <span class="text-red-500">-{{ participant.abs_dues }}</span>
+                    {% else %}
+                        <!-- Display in Green if dues are positive (overpaid) -->
+                        <span class="text-green-500">+{{ participant.abs_dues }}</span>
+                    {% endif %}
+                </td>
+                <!-- <td class="border border-gray-300 px-4 py-2 {% if participant.dues < 0 %}text-green-500{% else %}text-red-500{% endif %}">
+                    ₹{{ participant.dues }}
+                </td> -->
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-gray-500 py-4">No participants found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
